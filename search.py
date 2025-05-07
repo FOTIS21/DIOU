@@ -18,6 +18,9 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import Stack
+from util import Queue
+from util import PriorityQueue
 
 class SearchProblem:
     """
@@ -87,17 +90,75 @@ def depthFirstSearch(problem):
     print("Start's nextStates:", problem.getNextStates(problem.getInitialState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    stack = Stack()
+    visited = set()
+
+    stack.push((problem.getInitialState(), []))
+
+    while not stack.isEmpty():
+        state, path = stack.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        if state not in visited:
+            visited.add(state)
+            for next_state, action, cost in problem.getNextStates(state):
+                stack.push((next_state, path + [action]))
+
+    return []
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = Queue()
+    visited = set()
+
+    queue.push((problem.getInitialState(), []))
+
+    while not queue.isEmpty():
+        state, path = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        if state not in visited:
+            visited.add(state)
+
+            for successor, action, cost in problem.getNextStates(state):
+                if successor not in visited:
+                    queue.push((successor, path + [action]))
+
+    return []
+
+
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = PriorityQueue()
+    visited = {}
+
+    queue.push((problem.getInitialState(), [], 0), priority=0)
+
+    while not queue.isEmpty():
+        state, path, cost = queue.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        if state not in visited or cost< visited[state]:
+            visited[state] = cost
+
+            for successor, action, stepCost in problem.getNextStates(state):
+                new_cost = cost + stepCost
+                new_path = path + [action]
+                queue.push((successor, new_path, new_cost), priority=new_cost)
+
+    return []
+
 
 def nullHeuristic(state, problem=None):
     """
