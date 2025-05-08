@@ -38,6 +38,7 @@ from game import Directions
 from game import Agent
 from game import Actions
 import util
+from util import manhattanDistance
 import time
 import search
 
@@ -452,9 +453,25 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    # https://stackoverflow.com/questions/9994913/pacman-what-kinds-of-heuristics-are-mainly-used
+    # Drew inspiration from this discussion but didn't use mazeDistance as specified in the prompt.
+    position, foodGrid = state
+    foodList = foodGrid.asList()
+
+    if not foodList:
+        return 0
+
+    minDistanceToFood = min(manhattanDistance(position, food) for food in foodList)
+
+    maxFoodPairDistance = 0
+    for i in range(len(foodList)):
+        for j in range(i + 1, len(foodList)):
+            dist = manhattanDistance(foodList[i], foodList[j])
+            if dist > maxFoodPairDistance:
+                maxFoodPairDistance = dist
+
+    return minDistanceToFood + maxFoodPairDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
