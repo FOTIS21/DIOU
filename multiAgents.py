@@ -10,7 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+import math
 
 from util import manhattanDistance
 from game import Directions
@@ -53,6 +53,57 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+    def minimax(self, gameState, agentIndex, depth):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), None
+
+        if agentIndex == 0:
+            return self.maxValue(gameState, depth, agentIndex)
+        else:
+            return self.minValue(gameState, depth, agentIndex)
+
+    def maxValue(self, state, currentDepth, agentIndex):
+        v = float("-inf")
+        bestAction = None
+        allActions = state.getAvailableActions(agentIndex)
+        for action in allActions:
+            successor = state.generateNextState(agentIndex, action)
+            successorIndex = agentIndex + 1
+            successorDepth = currentDepth
+
+            if successorIndex == state.getNumAgents():
+                successorIndex = 0
+                successorDepth += 1
+
+            successorValue = self.minimax(successor, successorIndex, successorDepth)[0]
+
+            if successorValue > v:
+                v = successorValue
+                bestAction = action
+
+        return v, bestAction
+
+    def minValue(self, state, currentDepth, agentIndex):
+        v = float("inf")
+        bestAction = None
+        allActions = state.getAvailableActions(agentIndex)
+        for action in allActions:
+            successor = state.generateNextState(agentIndex, action)
+            successorIndex = agentIndex + 1
+            successorDepth = currentDepth
+
+            if successorIndex == state.getNumAgents():
+                successorIndex = 0
+                successorDepth += 1
+
+            successorValue = self.minimax(successor, successorIndex, successorDepth)[0]
+
+            if successorValue < v:
+                v = successorValue
+                bestAction = action
+
+        return v, bestAction
+
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
@@ -77,7 +128,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        bestScore, bestAction = self.minimax(gameState, 0, 0)
+
+        return bestAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
