@@ -293,22 +293,20 @@ def betterEvaluationFunction(currentGameState):
     foodList = currentGameState.getFood().asList()
     capsuleList = currentGameState.getCapsules()
     ghostStates = currentGameState.getGhostStates()
-    ghostPositions = [ghost.getPosition() for ghost in ghostStates]
+    # ghostPositions = [ghost.getPosition() for ghost in ghostStates]
     ghostScaredTimers = [ghost.scaredTimer for ghost in ghostStates]
 
-    # Start with the base game score
     score = currentGameState.getScore()
 
-    # Penalize distance to the closest food
     if foodList:
         closestFoodDist = min(manhattanDistance(pacmanPos, food) for food in foodList)
-        score += 10.0 / (closestFoodDist + 1)  # Encourage getting closer to food
+        score += 3 / (closestFoodDist + 1)  # Encourage getting closer to food
 
     # Penalize based on the number of food left
-    score -= 4 * len(foodList)
+    score -= 1 * len(foodList)
 
-    # Penalize based on the number of capsules left
-    score -= 20 * len(capsuleList)
+    # Penalize based on the number of power pellets left
+    score -= 5 * len(capsuleList)
 
     # Ghost-related scoring
     for i, ghost in enumerate(ghostStates):
@@ -316,13 +314,13 @@ def betterEvaluationFunction(currentGameState):
         distance = manhattanDistance(pacmanPos, ghostPos)
         if ghostScaredTimers[i] > 0:
             # Chase scared ghosts
-            score += 200.0 / (distance + 1)
+            score += 50 / (distance + 1)
         else:
             # Avoid active ghosts
             if distance <= 1:
-                score -= 500  # Big penalty for being too close to an active ghost
+                score -= 200  # Big penalty for being too close to an active ghost
             elif distance <= 2:
-                score -= 200
+                score -= 100
             else:
                 score -= 2.0 / distance
 
